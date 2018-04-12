@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "scripts": {
     "dev:postinstall": "bower install",
-    "pre-commit": "npm run lint npm && run build && npm run test && npm run test:fixtures",
+    "precommit": "npm run lint && npm run build && npm run test && npm run test:fixtures",
     "patch:publish": "npm version patch && npm publish",
     "test": "jest",
     "build": "del-cli ./dist && tsc",

@@ -21,7 +21,7 @@ interface IPluginOptions {
     bindWindowToThis?: boolean;
 }
 
-export default function (): babel.PluginObj {
+export default function(): babel.PluginObj {
     return {
         visitor: {
             CallExpression(path: NodePath<t.CallExpression>, state: { opts?: IPluginOptions }) {
@@ -34,9 +34,7 @@ export default function (): babel.PluginObj {
                     callee.object.name === CONSTANTS.OBJECT_NAME &&
                     t.isIdentifier(callee.property) &&
                     callee.property.name === CONSTANTS.DEFINE_NAME;
-                const isDefine =
-                    t.isIdentifier(callee) &&
-                    callee.name === CONSTANTS.DEFINE_NAME;
+                const isDefine = t.isIdentifier(callee) && callee.name === CONSTANTS.DEFINE_NAME;
 
                 // Get NEJ module function definition
                 if (isNejDefine || isDefine) {
@@ -65,7 +63,7 @@ export default function (): babel.PluginObj {
                                 }
 
                                 if (pluginOptions.nejPathAliases) {
-                                    dependencyList = _.map(dependencyList, (dep) => {
+                                    dependencyList = _.map(dependencyList, dep => {
                                         dep.value = transformDependencyWithNejAliases(
                                             dep.value,
                                             pluginOptions.nejPathAliases,
@@ -101,13 +99,13 @@ export default function (): babel.PluginObj {
                                         param => param === bindingPath.node,
                                     );
                                     const firstCallExpParentPath = bindingPath.findParent(p => t.isCallExpression(p));
-                                    if (firstCallExpParentPath &&
-                                        t.isCallExpression(firstCallExpParentPath.node)) {
+                                    if (firstCallExpParentPath && t.isCallExpression(firstCallExpParentPath.node)) {
                                         const fn = firstCallExpParentPath.node.arguments[argPos];
                                         if (isFunction(fn)) {
                                             fnDef = fn;
-                                            fnDefPath =
-                                                firstCallExpParentPath.get(`arguments.${argPos}`) as typeof fnDefPath;
+                                            fnDefPath = firstCallExpParentPath.get(
+                                                `arguments.${argPos}`,
+                                            ) as typeof fnDefPath;
                                         }
                                     }
                                 } else if (
@@ -115,8 +113,7 @@ export default function (): babel.PluginObj {
                                     isFunction(bindingPath.node.init)
                                 ) {
                                     fnDef = bindingPath.node.init;
-                                    fnDefPath =
-                                        bindingPath.get(`init`) as typeof fnDefPath;
+                                    fnDefPath = bindingPath.get(`init`) as typeof fnDefPath;
                                 } else {
                                     traverse(
                                         binding.path.scope.block,
@@ -170,27 +167,18 @@ export default function (): babel.PluginObj {
                                 _.slice(functionDefinition.params, dependencyList.length),
                                 (id: t.Identifier, paramIndex: number) => {
                                     return createInjectedNejParamAssignment(id.name, paramIndex);
-                                })
+                                },
+                            )
                                 .concat(functionDefinition.body.body)
-                                .concat(
-                                firstInjectedIdentifier ?
-                                    t.returnStatement(firstInjectedIdentifier) :
-                                    [],
-                            ),
+                                .concat(firstInjectedIdentifier ? t.returnStatement(firstInjectedIdentifier) : []),
                         ),
                     );
 
                     if (pluginOptions && pluginOptions.bindWindowToThis) {
-                        newFunctionDefinition =
-                            t.callExpression(
-                                t.memberExpression(
-                                    newFunctionDefinition,
-                                    t.identifier('bind'),
-                                ),
-                                [
-                                    t.identifier('window'),
-                                ],
-                            );
+                        newFunctionDefinition = t.callExpression(
+                            t.memberExpression(newFunctionDefinition, t.identifier('bind')),
+                            [t.identifier('window')],
+                        );
                     }
 
                     if (functionDefinitionVar) {
@@ -198,15 +186,11 @@ export default function (): babel.PluginObj {
                     }
 
                     path.replaceWith(
-                        t.callExpression(
-                            t.identifier(CONSTANTS.DEFINE_NAME),
-                            [
-                                moduleId || t.stringLiteral(''),
-                                t.arrayExpression(dependencyList),
-                                functionDefinitionVar ?
-                                    functionDefinitionVar : newFunctionDefinition,
-                            ],
-                        ),
+                        t.callExpression(t.identifier(CONSTANTS.DEFINE_NAME), [
+                            moduleId || t.stringLiteral(''),
+                            t.arrayExpression(dependencyList),
+                            functionDefinitionVar ? functionDefinitionVar : newFunctionDefinition,
+                        ]),
                     );
 
                     path.stop();
