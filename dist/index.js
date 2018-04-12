@@ -17,8 +17,7 @@ function default_1() {
                     callee.object.name === constants_1.CONSTANTS.OBJECT_NAME &&
                     t.isIdentifier(callee.property) &&
                     callee.property.name === constants_1.CONSTANTS.DEFINE_NAME;
-                var isDefine = t.isIdentifier(callee) &&
-                    callee.name === constants_1.CONSTANTS.DEFINE_NAME;
+                var isDefine = t.isIdentifier(callee) && callee.name === constants_1.CONSTANTS.DEFINE_NAME;
                 if (isNejDefine || isDefine) {
                     var functionDefinition_1;
                     var functionDefinitionPath_1;
@@ -72,21 +71,18 @@ function default_1() {
                                 if (bindingPath_1.parentKey === 'params' && t.isFunctionExpression(bindingPath_1.parent)) {
                                     var argPos = _.findIndex(bindingPath_1.parent.params, function (param) { return param === bindingPath_1.node; });
                                     var firstCallExpParentPath = bindingPath_1.findParent(function (p) { return t.isCallExpression(p); });
-                                    if (firstCallExpParentPath &&
-                                        t.isCallExpression(firstCallExpParentPath.node)) {
+                                    if (firstCallExpParentPath && t.isCallExpression(firstCallExpParentPath.node)) {
                                         var fn = firstCallExpParentPath.node.arguments[argPos];
                                         if (helpers_1.isFunction(fn)) {
                                             fnDef_1 = fn;
-                                            fnDefPath_1 =
-                                                firstCallExpParentPath.get("arguments." + argPos);
+                                            fnDefPath_1 = firstCallExpParentPath.get("arguments." + argPos);
                                         }
                                     }
                                 }
                                 else if (t.isVariableDeclarator(bindingPath_1.node) &&
                                     helpers_1.isFunction(bindingPath_1.node.init)) {
                                     fnDef_1 = bindingPath_1.node.init;
-                                    fnDefPath_1 =
-                                        bindingPath_1.get("init");
+                                    fnDefPath_1 = bindingPath_1.get("init");
                                 }
                                 else {
                                     babel_core_1.traverse(binding.path.scope.block, {
@@ -126,14 +122,9 @@ function default_1() {
                         return helpers_1.createInjectedNejParamAssignment(id.name, paramIndex);
                     })
                         .concat(functionDefinition_1.body.body)
-                        .concat(firstInjectedIdentifier ?
-                        t.returnStatement(firstInjectedIdentifier) :
-                        [])));
+                        .concat(firstInjectedIdentifier ? t.returnStatement(firstInjectedIdentifier) : [])));
                     if (pluginOptions && pluginOptions.bindWindowToThis) {
-                        newFunctionDefinition =
-                            t.callExpression(t.memberExpression(newFunctionDefinition, t.identifier('bind')), [
-                                t.identifier('window'),
-                            ]);
+                        newFunctionDefinition = t.callExpression(t.memberExpression(newFunctionDefinition, t.identifier('bind')), [t.identifier('window')]);
                     }
                     if (functionDefinitionVar_1) {
                         functionDefinitionPath_1.replaceWith(newFunctionDefinition);
@@ -141,8 +132,7 @@ function default_1() {
                     path.replaceWith(t.callExpression(t.identifier(constants_1.CONSTANTS.DEFINE_NAME), [
                         moduleId_1 || t.stringLiteral(''),
                         t.arrayExpression(dependencyList_1),
-                        functionDefinitionVar_1 ?
-                            functionDefinitionVar_1 : newFunctionDefinition,
+                        functionDefinitionVar_1 ? functionDefinitionVar_1 : newFunctionDefinition,
                     ]));
                     path.stop();
                 }
